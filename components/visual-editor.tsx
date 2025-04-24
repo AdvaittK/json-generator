@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -27,17 +27,38 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
     if (isValid) {
       try {
         const parsed = JSON.parse(value)
-        setJsonData(parsed)
+        // Only update if the JSON data is actually different to prevent infinite loops
+        if (JSON.stringify(parsed) !== JSON.stringify(jsonData)) {
+          setJsonData(parsed)
+        }
       } catch (e) {
         // If there's an error, don't update
       }
     }
   }, [value, isValid])
 
-  // Update parent component when jsonData changes
+  // Only update parent component when jsonData changes from user interactions
+  // We skip this effect on the initial render and when the change was initiated from the parent
+  const isInitialRender = useRef(true)
+  const isParentUpdate = useRef(false)
+  
   useEffect(() => {
-    onChange(jsonData)
+    if (isInitialRender.current) {
+      isInitialRender.current = false
+      return
+    }
+    
+    if (!isParentUpdate.current) {
+      onChange(jsonData)
+    } else {
+      isParentUpdate.current = false
+    }
   }, [jsonData, onChange])
+  
+  // When value changes from parent, mark it as a parent update
+  useEffect(() => {
+    isParentUpdate.current = true
+  }, [value])
 
   // Function to add a new key-value pair to an object
   const addKeyValue = (obj: any, path: string[] = []) => {
