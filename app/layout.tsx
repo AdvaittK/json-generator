@@ -28,5 +28,11 @@ export default function RootLayout({
 }
 
 export const metadata = {
-      generator: 'v0.dev'
+  title: "JSON Generator",
+  description: "A visual JSON generator tool",
+  generator: 'v0.dev',
+  icons: {
+    icon: "/json-logo.png",
+    apple: "/json-logo.png",
+  }
     };
