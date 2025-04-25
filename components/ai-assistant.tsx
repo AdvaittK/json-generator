@@ -302,14 +302,14 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
                 <Alert className="bg-green-50 dark:bg-green-900/20">
                   <Key className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <AlertTitle>Server-Side Integration</AlertTitle>
-                  <AlertDescription>The AI assistant is connected to Hugging Face via secure server-side API calls.</AlertDescription>
+                  <AlertDescription>The AI assistant is connected to Google Gemini API using your personal API key via secure server-side API calls.</AlertDescription>
                 </Alert>
 
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">About the AI Assistant</h3>
                   <p className="text-sm text-gray-500">
-                    The AI assistant uses Hugging Face's language models to help you with JSON generation, validation, and more.
-                    Your conversations are processed securely on the server.
+                    The AI assistant uses Google's Gemini 1.5 Flash model to help you with JSON generation, validation, and more.
+                    Your conversations are processed securely on the server without exposing your API key to the client.
                   </p>
                 </div>
               </div>

@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(req: NextRequest) {
   try {
     console.log("Chat API route called");
     
-    // Use Hugging Face's demo API key or your own if provided
-    const apiKey = process.env.HUGGINGFACE_API_KEY || 'hf_demo';
+    // Validate Gemini API key - only use your personal key, no fallback
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+      console.error("Gemini API key is not set in environment variables");
+      return NextResponse.json(
+        { error: 'Please add your Gemini API key to the .env.local file' },
+        { status: 500 }
+      );
+    }
+    console.log("Using your personal API key");
     
     // Parse request body
     const body = await req.json();
@@ -18,91 +28,66 @@ export async function POST(req: NextRequest) {
     
     console.log(`Processing ${messages.length} messages`);
 
-    // Format the conversation for Hugging Face API
-    // Get the last user message
-    const lastMessage = messages[messages.length - 1].content;
-    
-    // Create a context from previous messages
-    const context = messages
-      .slice(0, -1)
-      .map(m => `${m.role === 'user' ? 'Human' : 'AI'}: ${m.content}`)
-      .join('\n');
-    
-    // Add JSON context if available
-    let jsonContextStr = '';
-    if (jsonContext) {
-      jsonContextStr = `\nCurrent JSON in the editor:\n\`\`\`json\n${jsonContext}\n\`\`\`\n`;
-    }
-    
-    // Create the final prompt with specific instructions for JSON assistance
-    const prompt = `You are a helpful JSON assistant. Please help with JSON generation, explanation, and validation.
-${context}${jsonContextStr}
-Human: ${lastMessage}
-AI: `;
+    try {      console.log("Calling Gemini API...");
 
-    try {
-      console.log("Generating fallback response...");
+      // Initialize the Gemini client with your personal key
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-pro", // Use gemini-pro which is more widely available
+      });
+
+      // Create system prompt with JSON context
+      let systemPrompt = "You are a helpful JSON assistant. Help users with JSON generation, validation, and explanation. Always format JSON output with triple backticks and the json language identifier.";
       
-      // If Hugging Face API fails, use this simple fallback response generator
-      let assistantMessage = generateSimpleResponse(lastMessage, jsonContext);
+      if (jsonContext) {
+        systemPrompt += `\n\nThe user is currently working with this JSON in their editor:\n\`\`\`json\n${jsonContext}\n\`\`\``;
+      }
+
+      // Get the current user message
+      const userMessage = messages[messages.length - 1].content;
       
-      // Try to call the API first, but don't wait too long
-      try {
-        // Set up an abort controller with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-        
-        // Call a very small, reliable model
-        const response = await fetch(
-          "https://api-inference.huggingface.co/models/distilbert/distilbert-base-uncased",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json", 
-              "Authorization": `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-              inputs: prompt.slice(0, 500), // Limit input size
-              options: {
-                wait_for_model: true,
-                use_cache: true
-              }
-            }),
-            signal: controller.signal
-          }
-        );
-        
-        // Clear timeout since we got a response
-        clearTimeout(timeoutId);
-        
-        // Process the response if it was successful
-        if (response.ok) {
-          const result = await response.json();
-          if (result && 
-             (Array.isArray(result) && result[0]?.generated_text || 
-              result.generated_text)) {
-            
-            const generated = Array.isArray(result) ? 
-              result[0]?.generated_text : 
-              result.generated_text;
-              
-            if (generated && generated.trim().length > 0) {
-              assistantMessage = generated.trim();
-            }
-          }
+      // Create a simplified approach that works reliably
+      let prompt = `${systemPrompt}\n\n`;
+      
+      // Add conversation history
+      if (messages.length > 1) {
+        // Add up to 5 previous messages for context
+        const contextMessages = messages.slice(Math.max(0, messages.length - 6), messages.length - 1);
+        for (const msg of contextMessages) {
+          prompt += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n\n`;
         }
-      } catch (apiError) {
-        console.log("Using fallback response due to API error:", apiError);
-        // Continue with the fallback response
       }
       
-      console.log("Response generated");
-      return NextResponse.json({ message: assistantMessage });
+      // Add the current message
+      prompt += `User: ${userMessage}\n\nAssistant: `;
+
+      // Generate content with simple prompt
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const assistantMessage = response.text();
       
-    } catch (error) {
-      console.error("Error in API handling:", error);
-      // Use fallback even if everything else fails
-      const fallbackResponse = "I'm sorry, but I'm having trouble connecting to the AI service right now. Here are some examples of valid JSON:\n\n```json\n{\n  \"user\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"isActive\": true\n  }\n}\n```\n\nCould you please try again in a moment?";
+      console.log("Received response from Gemini");
+      
+      return NextResponse.json({ message: assistantMessage });
+    } catch (apiError) {
+      console.error("Gemini API error details:", apiError);
+      
+      // Create appropriate error message based on error type
+      let errorMessage = 'Failed to get response from Gemini';
+      
+      if (apiError instanceof Error) {
+        if (apiError.message.includes('API key')) {
+          errorMessage = 'Invalid Gemini API key provided';
+        } else if (apiError.message.includes('quota')) {
+          errorMessage = 'Gemini API quota exceeded';
+        } else if (apiError.message.includes('rate limit')) {
+          errorMessage = 'API rate limit exceeded, please try again later';
+        }
+      }
+      
+      // Generate fallback response for all errors
+      const fallbackResponse = generateSimpleResponse(messages[messages.length - 1].content, jsonContext);
+      console.log("Using fallback response due to error:", errorMessage);
       return NextResponse.json({ message: fallbackResponse });
     }
   } catch (error) {
