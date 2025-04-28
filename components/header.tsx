@@ -30,29 +30,36 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
+          <Link 
+            href="/" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/' ? 'text-primary' : ''}`}
+          >
             Home
           </Link>
-          <Link href="#features" className="text-sm font-medium transition-colors hover:text-primary">
+          <Link 
+            href="/features" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/features' ? 'text-primary' : ''}`}
+          >
             Features
           </Link>
-          <Link href="#editor" className="text-sm font-medium transition-colors hover:text-primary">
+          <Link 
+            href="/editor" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/editor' ? 'text-primary' : ''}`}
+          >
             Editor
           </Link>
           <Link
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium transition-colors hover:text-primary"
+            href="/billing"
+            className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/billing' ? 'text-primary' : ''}`}
           >
-            GitHub
+            Pricing
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
           <ModeToggle />
           <Button variant="default" size="sm" className="hidden md:inline-flex" asChild>
-            <Link href="#editor">Try Now</Link>
+            <Link href="/editor">Try Now</Link>
           </Button>
 
           {/* Mobile Menu Button */}
@@ -68,36 +75,34 @@ export default function Header() {
           <nav className="flex flex-col space-y-4">
             <Link
               href="/"
-              className="text-sm font-medium transition-colors hover:text-primary"
+              className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/' ? 'text-primary' : ''}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link
-              href="#features"
-              className="text-sm font-medium transition-colors hover:text-primary"
+              href="/features"
+              className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/features' ? 'text-primary' : ''}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Features
             </Link>
             <Link
-              href="#editor"
-              className="text-sm font-medium transition-colors hover:text-primary"
+              href="/editor"
+              className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/editor' ? 'text-primary' : ''}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Editor
             </Link>
             <Link
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium transition-colors hover:text-primary"
+              href="/billing"
+              className={`text-sm font-medium transition-colors hover:text-primary ${pathname === '/billing' ? 'text-primary' : ''}`}
               onClick={() => setIsMenuOpen(false)}
             >
-              GitHub
+              Pricing
             </Link>
             <Button variant="default" size="sm" className="w-full" asChild onClick={() => setIsMenuOpen(false)}>
-              <Link href="#editor">Try Now</Link>
+              <Link href="/editor">Try Now</Link>
             </Button>
           </nav>
         </div>

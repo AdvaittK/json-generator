@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react"
+import { Plus, Trash2, ChevronUp, ChevronDown, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 
@@ -21,6 +21,7 @@ type JsonValueType = "string" | "number" | "boolean" | "object" | "array" | "nul
 export default function VisualEditor({ value, onChange, isValid }: VisualEditorProps) {
   const { toast } = useToast()
   const [jsonData, setJsonData] = useState<any>({})
+  const [isGenerating, setIsGenerating] = useState(false)
 
   // Parse JSON when value changes
   useEffect(() => {
@@ -59,6 +60,81 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
   useEffect(() => {
     isParentUpdate.current = true
   }, [value])
+
+  // Function to generate JSON using the AI
+  const generateJson = async () => {
+    // If we have existing JSON structure, use it as a template
+    if (Object.keys(jsonData).length > 0) {
+      setIsGenerating(true)
+      
+      try {
+        // Create a specific prompt that instructs the AI to preserve the structure
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages: [
+              {
+                role: "user",
+                content: `I have the following JSON structure:\n\`\`\`json\n${JSON.stringify(jsonData, null, 2)}\n\`\`\`\n\nPlease generate a new JSON that maintains this exact structure (same keys and hierarchy), but fill it with realistic sample data. Keep all the keys the same but update the values with realistic, appropriate data that matches the key names and value types.`
+              }
+            ]
+          }),
+        })
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        
+        // Extract JSON from the response if present
+        const jsonMatch = data.message.match(/```json\n([\s\S]*?)\n```/)
+        if (jsonMatch && jsonMatch[1]) {
+          try {
+            // Validate JSON before setting
+            const parsed = JSON.parse(jsonMatch[1])
+            onChange(parsed)
+            setJsonData(parsed)
+            
+            toast({
+              title: "JSON Generated",
+              description: "Your JSON has been filled with data while preserving the structure.",
+            })
+          } catch (error) {
+            toast({
+              title: "Invalid JSON Generated",
+              description: "The AI produced invalid JSON. Please try again.",
+              variant: "destructive",
+            })
+          }
+        } else {
+          toast({
+            title: "No JSON Found",
+            description: "The AI didn't generate valid JSON.",
+            variant: "destructive",
+          })
+        }
+      } catch (error) {
+        toast({
+          title: "Generation Failed",
+          description: "An error occurred while generating JSON.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsGenerating(false)
+      }
+    } else {
+      // If no structure exists, prompt to first define a structure
+      toast({
+        title: "No Structure Defined",
+        description: "Please define a JSON structure first by adding properties.",
+        variant: "destructive",
+      })
+    }
+  }
 
   // Function to add a new key-value pair to an object
   const addKeyValue = (obj: any, path: string[] = []) => {
@@ -430,16 +506,33 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
         </div>
       ) : (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-          <div className="mb-4">
-            <h3 className="text-lg font-medium">Visual JSON Builder</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Build your JSON structure visually by adding, editing, and removing properties.
-            </p>
+          <div className="mb-4 flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-medium">JSON Structure Builder</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Define JSON structure visually, then click "Generate Data" to fill it with realistic values.
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800 dark:hover:bg-purple-900/30"
+              onClick={generateJson}
+              disabled={isGenerating}
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              {isGenerating ? "Generating..." : "Generate Data"}
+            </Button>
           </div>
 
           {Object.keys(jsonData).length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8">
-              <p className="text-gray-500 mb-4">Your JSON is empty. Add a property to get started.</p>
+              <p className="text-gray-500 mb-2">Start by defining your JSON structure:</p>
+              <p className="text-gray-500 mb-4 text-center text-sm max-w-md">
+                1. Add properties and define their types<br/>
+                2. Create the exact structure you need<br/>
+                3. Click "Generate Data" to automatically fill with realistic values
+              </p>
               <Button onClick={() => addKeyValue(jsonData)}>
                 <Plus className="mr-2 h-4 w-4" /> Add Property
               </Button>

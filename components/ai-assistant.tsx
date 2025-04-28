@@ -9,10 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Send, Bot, User, Key } from "lucide-react"
+import { Send, Bot, User, Key, Sparkles, CornerDownLeft, Loader2, Copy, Check } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
 import { useLocalStorage } from "@/hooks/use-local-storage"
+import { Textarea } from "@/components/ui/textarea"
 
 interface AiAssistantProps {
   jsonValue: string
@@ -30,15 +31,31 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Hello! I'm your JSON assistant. I can help you generate, fix, or explain JSON. What would you like to do today?",
+      content: "Hello! I'm your JSON assistant. How can I help you today? I can generate JSON, fix errors, or explain JSON concepts.",
     },
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  // No longer need API key state as it's now server-side
+  const [copied, setCopied] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to the bottom of the messages
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [messages])
+
+  // Reset copied state after 2 seconds
+  useEffect(() => {
+    if (copied) {
+      const timeout = setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+      return () => clearTimeout(timeout)
+    }
+  }, [copied])
 
   // Scroll chat container to bottom when messages change - contained scroll only
   useEffect(() => {
@@ -52,86 +69,119 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
     }
   }, [messages])
 
-  // Function to handle sending a message
   const handleSendMessage = async () => {
     if (!input.trim()) return
 
-    const userMessage = input
+    // Add user message to the chat
+    const userMessage = { role: "user" as const, content: input }
+    setMessages((prev) => [...prev, userMessage])
     setInput("")
-
-    // Add user message to chat
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
-
     setIsLoading(true)
 
     try {
-      // Prepare messages for API - include conversation history for context
-      const messageHistory = [...messages, { role: "user", content: userMessage }];
-
-      // Call our server-side API endpoint
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          messages: messageHistory,
-          jsonContext: isValid ? jsonValue : undefined // Optionally send current JSON for context
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          jsonContext: jsonValue 
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get a response');
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json();
-      const assistantResponse = data.message;
-
-      setMessages((prev) => [...prev, { role: "assistant", content: assistantResponse }]);
+      const data = await response.json()
       
+      // Add assistant message to the chat
+      setMessages((prev) => [...prev, { role: "assistant", content: data.message }])
+      
+      // Extract JSON from the response if present
+      const jsonMatch = data.message.match(/```json\n([\s\S]*?)\n```/)
+      if (jsonMatch && jsonMatch[1]) {
+        try {
+          // Validate JSON before setting
+          JSON.parse(jsonMatch[1])
+          
+          // Show a toast with a button to apply the JSON
+          toast({
+            title: "JSON Generated",
+            description: "Would you like to apply this JSON to the editor?",
+            action: (
+              <Button variant="outline" size="sm" onClick={() => setJsonValue(jsonMatch[1])}>
+                Apply to Editor
+              </Button>
+            ),
+          })
+        } catch (error) {
+          // If invalid JSON, just show in the chat without offering to apply
+          console.error("Invalid JSON in response:", error)
+        }
+      }
     } catch (error) {
-      console.error("Error sending message:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to get a response from the AI assistant.",
-        variant: "destructive",
-      });
+      console.error("Error:", error)
+      
+      // Add error message to the chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sorry, I encountered an error processing your request. Please try again later.",
+        },
+      ])
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 
-  // No API key handling needed with server-side implementation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
 
-  // Function to apply JSON from chat
-  const applyJsonFromMessage = (message: string) => {
-    // Extract JSON from message (between ```json and ```)
-    const jsonMatch = message.match(/```json\n([\s\S]*?)\n```/)
+  const handleCopyResponse = (content: string) => {
+    navigator.clipboard.writeText(content)
+    setCopied(true)
+    toast({
+      title: "Copied to clipboard",
+      description: "Response has been copied to your clipboard",
+    })
+  }
+
+  // Extract JSON from message if present
+  const extractAndApplyJson = (content: string) => {
+    const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/)
     if (jsonMatch && jsonMatch[1]) {
       try {
-        // Validate the JSON
-        const parsed = JSON.parse(jsonMatch[1])
-        const formatted = JSON.stringify(parsed, null, 2)
-        setJsonValue(formatted)
+        // Validate JSON before setting
+        JSON.parse(jsonMatch[1])
+        setJsonValue(jsonMatch[1])
         toast({
           title: "JSON Applied",
-          description: "The JSON from the chat has been applied to the editor.",
+          description: "The JSON has been applied to the editor",
         })
-      } catch (e) {
+      } catch (error) {
         toast({
           title: "Invalid JSON",
-          description: "The JSON in the message could not be parsed.",
+          description: "The extracted JSON is not valid",
           variant: "destructive",
         })
       }
-    } else {
-      toast({
-        title: "No JSON Found",
-        description: "No valid JSON block was found in the message.",
-        variant: "destructive",
-      })
     }
+  }
+
+  // Helper function to format message content with syntax highlighting
+  const formatMessageContent = (content: string) => {
+    // Replace code blocks with highlighted syntax
+    return content.replace(
+      /```(json)?\n([\s\S]*?)\n```/g,
+      '<pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto my-2"><code class="text-sm font-mono">$2</code></pre>'
+    )
   }
 
   // Function to handle quick prompts
@@ -207,7 +257,7 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
                                     variant="ghost"
                                     size="sm"
                                     className="h-6 text-xs"
-                                    onClick={() => applyJsonFromMessage(message.content)}
+                                    onClick={() => extractAndApplyJson(message.content)}
                                   >
                                     Apply to Editor
                                   </Button>
@@ -267,25 +317,29 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
             </div>
 
             <div className="flex gap-2">
-              <Input
-                placeholder="Ask the AI assistant..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSendMessage()
-                  }
-                }}
-                disabled={isLoading}
-              />
-              <Button 
-                onClick={handleSendMessage} 
-                disabled={isLoading || !input.trim()} 
-                className="shrink-0"
-                aria-label="Send message"
+              <div className="relative flex-1">
+                <Textarea
+                  placeholder="Ask about JSON or request generation..."
+                  className="min-h-[80px] resize-none pr-10"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={isLoading}
+                />
+                <div className="absolute bottom-2 right-2 text-gray-400">
+                  <CornerDownLeft className="h-4 w-4" />
+                </div>
+              </div>
+              <Button
+                className="h-10 w-10 rounded-full p-0"
+                disabled={isLoading || !input.trim()}
+                onClick={handleSendMessage}
               >
-                <Send className="h-4 w-4" />
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
               </Button>
             </div>
           </div>
@@ -308,7 +362,7 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">About the AI Assistant</h3>
                   <p className="text-sm text-gray-500">
-                    The AI assistant uses Google's Gemini 1.5 Flash model to help you with JSON generation, validation, and more.
+                    The AI assistant uses Google's Gemini 1.5 Pro model to help you with JSON generation, validation, and more.
                     Your conversations are processed securely on the server without exposing your API key to the client.
                   </p>
                 </div>

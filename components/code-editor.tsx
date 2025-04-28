@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
+import { useToast } from "@/hooks/use-toast"
 
 // We'll use dynamic import for Monaco Editor to avoid SSR issues
 import dynamic from "next/dynamic"
@@ -20,6 +21,7 @@ interface CodeEditorProps {
 }
 
 export default function CodeEditor({ value, onChange, isValid }: CodeEditorProps) {
+  const { toast } = useToast()
   const editorRef = useRef<any>(null)
 
   // Function to handle editor mount
