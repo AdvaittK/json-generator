@@ -95,7 +95,7 @@ export default function StatsSection() {
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 text-white">S</div>
             </div>
             <div className="text-left">
-              <p className="font-semibold">Amey Dabhade</p>
+              <p className="font-semibold">John Doe</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">Software Developer</p>
             </div>
           </div>
