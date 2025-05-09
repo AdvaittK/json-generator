@@ -1,99 +1,64 @@
-# JSONAI - Advanced JSON Generator & Editor
+# JSON Generator
 
-![JSONAI](public/json-logo.png)
+A powerful tool for generating, editing, and validating JSON data using AI and visual tools.
 
-A powerful and intuitive JSON generation and editing tool with AI assistance, visual editing capabilities, and developer-friendly features.
+## Features
 
-## 🚀 Features
+- **Code Editor**: Edit JSON directly with syntax highlighting and validation
+- **Visual Builder**: Create and modify JSON using a visual interface
+- **AI Generation**: Generate JSON data using Google Gemini AI
+- **Templates**: Save and load JSON templates
 
-- **Live JSON Editor** - Write, paste, and validate JSON in real-time with syntax highlighting and error detection
-- **Visual JSON Builder** - Create JSON structures visually without writing code
-- **AI Assistant** - Generate and modify JSON using natural language with our Gemini-powered AI
-- **Templates** - Start with pre-built templates or save your own for common JSON structures
-- **Dark/Light Mode** - Comfortable editing in any environment with theme customization
-- **Export Options** - Download as JSON file or copy to clipboard with one click
-- **Real-time Validation** - Instant feedback on syntax errors and formatting issues
-- **Monaco Editor** - Professional code editing experience with syntax highlighting
+## 🔑 API Key Setup (Required for AI Features)
 
-## 🛠️ Tech Stack
+To use the AI generation features, you need to set up a Google Gemini API key:
 
-- **Frontend**: Next.js 15.2.4 with React 19
-- **UI**: Tailwind CSS, shadcn/ui components, Framer Motion for animations
-- **Editor**: Monaco Editor for code editing
-- **AI**: Google Generative AI (Gemini 1.5 Pro) integration
-- **State Management**: React Hooks and Context API
-- **Form Handling**: React Hook Form with Zod validation
+1. Visit [Google MakerSuite](https://makersuite.google.com/app/apikey) to get your API key
+2. Create a `.env.local` file in the root directory of the project
+3. Add your API key to the file:
+   ```
+   GOOGLE_API_KEY=your-api-key-here
+   ```
+4. Restart the development server
 
-## 📋 Getting Started
+## Getting Started
 
-### Prerequisites
-
-- Node.js (v18 or later)
-- pnpm package manager
-
-### Installation
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/yourusername/jsonai.git
-   cd jsonai
+1. Install dependencies:
+   ```
+   npm install
    ```
 
-2. Install dependencies
-   ```bash
-   pnpm install
+2. Run the development server:
+   ```
+   npm run dev
    ```
 
-3. Set up environment variables
-   Create a `.env.local` file in the root directory and add your API key:
-   ```
-   GOOGLE_API_KEY=your_gemini_api_key
-   ```
+3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-4. Run the development server
-   ```bash
-   pnpm dev
-   ```
+## Using the JSON Generator
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+### 💬 Direct AI Generation
+Use the prompt bar at the top to generate complete JSON data structures. Try inputs like:
+- "restaurants in Pune"
+- "user profiles with addresses"
+- "product catalog for electronics"
 
-## 📊 System Architecture
+### 🔄 Visual Structure Builder
+1. Switch to the "Visual Builder" tab
+2. Add properties and define types to create a JSON structure
+3. Click "Generate Data" to fill the structure with realistic data
 
-The application follows a modern client-server architecture with Next.js:
+### 🤖 AI Assistant
+Switch to the AI Assistant tab for:
+- Help with JSON concepts
+- Fixing errors in your JSON
+- Generating specific JSON formats with explanations
 
-- **Client Components**: UI components, state management, theme provider
-- **Server Components**: API routes for AI integration
-- **External Services**: Google Generative AI (Gemini API)
+## Development
 
-For more details, see [System Architecture](docs/system-architecture.md).
+- Built with Next.js, TypeScript, and Tailwind CSS
+- Uses the Google Gemini API for AI features
 
-## 📱 Pages
+## License
 
-- **Home**: Landing page with features overview
-- **Editor**: Main JSON editing interface with code and visual editors
-- **Features**: Detailed feature showcase
-- **Billing**: Subscription plans and pricing
-
-## 🔧 Usage
-
-1. **JSON Editing**:
-   - Use the code editor for direct JSON manipulation
-   - Switch to visual editor for a no-code experience
-   - Validate and format your JSON with a single click
-
-2. **AI Assistant**:
-   - Ask the AI to generate JSON for specific use cases
-   - Get help with fixing errors or explaining concepts
-   - Apply AI suggestions directly to your editor
-
-3. **Templates**:
-   - Choose from pre-built templates for common structures
-   - Create and save your own templates for future use
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📜 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT

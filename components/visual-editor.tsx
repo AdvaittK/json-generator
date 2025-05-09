@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 
 interface VisualEditorProps {
   value: string
-  onChange: (value: any) => void
+  onChange: (value: Record<string, unknown>) => void
   isValid: boolean
 }
 
@@ -20,7 +20,7 @@ type JsonValueType = "string" | "number" | "boolean" | "object" | "array" | "nul
 
 export default function VisualEditor({ value, onChange, isValid }: VisualEditorProps) {
   const { toast } = useToast()
-  const [jsonData, setJsonData] = useState<any>({})
+  const [jsonData, setJsonData] = useState<Record<string, unknown>>({})
   const [isGenerating, setIsGenerating] = useState(false)
 
   // Parse JSON when value changes
@@ -355,7 +355,7 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
   }
 
   // Recursive component to render an array
-  const renderArray = (arr: any[], path: string[] = []) => {
+  const renderArray = (arr: unknown[], path: string[] = []) => {
     return (
       <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-700">
         {arr.map((item, index) => (
@@ -402,7 +402,7 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
   }
 
   // Component to render a value based on its type
-  const renderValue = (value: any, path: string[] = []) => {
+  const renderValue = (value: unknown, path: string[] = []) => {
     const type = getValueType(value)
 
     return (
@@ -428,7 +428,7 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
 
         {type === "string" && (
           <Input
-            value={value}
+            value={typeof value === 'string' ? value : String(value)}
             onChange={(e) => updateValue(jsonData, path[path.length - 1], e.target.value, "string", path.slice(0, -1))}
             className="flex-1"
           />
@@ -437,7 +437,7 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
         {type === "number" && (
           <Input
             type="number"
-            value={value}
+            value={typeof value === 'number' ? value : Number(value)}
             onChange={(e) => updateValue(jsonData, path[path.length - 1], e.target.value, "number", path.slice(0, -1))}
             className="flex-1"
           />
@@ -445,7 +445,7 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
 
         {type === "boolean" && (
           <Select
-            value={value.toString()}
+            value={typeof value === 'boolean' ? value.toString() : 'false'}
             onValueChange={(newValue) =>
               updateValue(jsonData, path[path.length - 1], newValue, "boolean", path.slice(0, -1))
             }
@@ -468,9 +468,9 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
           <Accordion type="single" collapsible className="flex-1">
             <AccordionItem value="item-1" className="border-0">
               <AccordionTrigger className="py-1 px-3 bg-gray-100 dark:bg-gray-800 rounded-md hover:no-underline">
-                Object {Object.keys(value).length > 0 ? `(${Object.keys(value).length} properties)` : "(empty)"}
+                Object {typeof value === 'object' && value !== null ? `(${Object.keys(value).length} properties)` : "(empty)"}
               </AccordionTrigger>
-              <AccordionContent>{renderObject(value, path)}</AccordionContent>
+              <AccordionContent>{typeof value === 'object' && value !== null ? renderObject(value, path) : null}</AccordionContent>
             </AccordionItem>
           </Accordion>
         )}
@@ -479,9 +479,9 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
           <Accordion type="single" collapsible className="flex-1">
             <AccordionItem value="item-1" className="border-0">
               <AccordionTrigger className="py-1 px-3 bg-gray-100 dark:bg-gray-800 rounded-md hover:no-underline">
-                Array {value.length > 0 ? `(${value.length} items)` : "(empty)"}
+                Array {Array.isArray(value) && value.length > 0 ? `(${value.length} items)` : "(empty)"}
               </AccordionTrigger>
-              <AccordionContent>{renderArray(value, path)}</AccordionContent>
+              <AccordionContent>{Array.isArray(value) ? renderArray(value, path) : null}</AccordionContent>
             </AccordionItem>
           </Accordion>
         )}
@@ -510,7 +510,7 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
             <div>
               <h3 className="text-lg font-medium">JSON Structure Builder</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Define JSON structure visually, then click "Generate Data" to fill it with realistic values.
+                Define JSON structure visually, then click &quot;Generate Data&quot; to fill it with realistic values.
               </p>
             </div>
             <Button 
@@ -531,7 +531,7 @@ export default function VisualEditor({ value, onChange, isValid }: VisualEditorP
               <p className="text-gray-500 mb-4 text-center text-sm max-w-md">
                 1. Add properties and define their types<br/>
                 2. Create the exact structure you need<br/>
-                3. Click "Generate Data" to automatically fill with realistic values
+                3. Click &quot;Generate Data&quot; to automatically fill with realistic values
               </p>
               <Button onClick={() => addKeyValue(jsonData)}>
                 <Plus className="mr-2 h-4 w-4" /> Add Property

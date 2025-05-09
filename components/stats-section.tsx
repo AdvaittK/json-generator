@@ -88,7 +88,7 @@ export default function StatsSection() {
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <p className="mb-4 italic text-gray-600 dark:text-gray-300">
-            "This JSON generator has saved me countless hours of work. The AI assistant is remarkably accurate and the visual builder makes complex JSON structures so much easier to create."
+            &quot;This JSON generator has saved me countless hours of work. The AI assistant is remarkably accurate and the visual builder makes complex JSON structures so much easier to create.&quot;
           </p>
           <div className="flex items-center justify-center gap-2">
             <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200">

@@ -1,4 +1,3 @@
-import { Metadata } from "next"
 import BillingHero from "@/components/billing-hero"
 import Pricing from "@/components/pricing"
 

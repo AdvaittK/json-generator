@@ -27,7 +27,7 @@ export default function ContactPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Send us a message</CardTitle>
-                <CardDescription>Fill out the form below and we'll get back to you as soon as possible.</CardDescription>
+                <CardDescription>Fill out the form below and we&apos;ll get back to you as soon as possible.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">

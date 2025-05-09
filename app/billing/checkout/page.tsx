@@ -16,7 +16,7 @@ export default function CheckoutPage() {
         <div className="mx-auto max-w-3xl">
           <h1 className="mb-6 text-center text-3xl font-bold tracking-tight sm:text-4xl">Complete your purchase</h1>
           <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
-            You're just a few steps away from accessing our Pro features
+            You&apos;re just a few steps away from accessing our Pro features
           </p>
           
           <div className="grid gap-6 md:grid-cols-[1fr_400px]">

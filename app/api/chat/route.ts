@@ -8,7 +8,9 @@ const genAI = new GoogleGenerativeAI(apiKey);
 export async function POST(request: NextRequest) {
   try {
     // Check if API key is available
+    console.log("API Key being used:", apiKey ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : "Not Set");
     if (!apiKey || apiKey === '') {
+      console.error("API key check failed!");
       return NextResponse.json(
         { 
           error: 'API key missing', 
@@ -23,6 +25,7 @@ export async function POST(request: NextRequest) {
     const { messages, jsonContext } = body;
 
     if (!messages || !Array.isArray(messages)) {
+      console.error("Invalid messages format received:", messages);
       return NextResponse.json(
         { error: 'Messages are required and must be an array' },
         { status: 400 }
@@ -30,7 +33,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get the Gemini model
+    console.log("Attempting to get Gemini model...");
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    console.log("Successfully got Gemini model.");
 
     // Create chat history from messages
     const chatHistory = messages.slice(0, -1).map(msg => ({
@@ -78,12 +83,17 @@ If the user asks for specific data structures or examples, provide them in prope
     ]);
     
     const response = result.response;
+    console.log("Gemini API Response received.");
     const responseText = response.text();
 
     // Return the response
+    console.log("Sending successful response back to client.");
     return NextResponse.json({ message: responseText });
   } catch (error) {
     console.error('Error in chat API:', error);
+    if (error instanceof Error) {
+      console.error("Error Details:", error.message, error.stack);
+    }
     
     return NextResponse.json(
       { 

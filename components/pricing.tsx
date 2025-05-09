@@ -90,7 +90,7 @@ export default function Pricing() {
         >
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">Simple, transparent pricing</h2>
           <p className="mt-4 text-gray-500 dark:text-gray-400">
-            Choose the plan that's right for you and start building amazing JSON structures today
+            Choose the plan that&apos;s right for you and start building amazing JSON structures today
           </p>
         </motion.div>
 

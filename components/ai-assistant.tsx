@@ -1,18 +1,14 @@
 "use client"
 
-import { Label } from "@/components/ui/label"
-
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Send, Bot, User, Key, Sparkles, CornerDownLeft, Loader2, Copy, Check } from "lucide-react"
+import { Send, Bot, User, Key, CornerDownLeft, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useToast } from "@/hooks/use-toast"
-import { useLocalStorage } from "@/hooks/use-local-storage"
 import { Textarea } from "@/components/ui/textarea"
 
 interface AiAssistantProps {
@@ -31,7 +27,7 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your JSON assistant. How can I help you today? I can generate JSON, fix errors, or explain JSON concepts.",
+      content: "Hello! I&apos;m your JSON assistant. How can I help you today? I can generate JSON, fix errors, or explain JSON concepts.",
     },
   ])
   const [input, setInput] = useState("")
@@ -79,6 +75,12 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
     setIsLoading(true)
 
     try {
+      console.log("Sending request to /api/chat")
+      console.log("Request payload:", { 
+        messages: [...messages, userMessage],
+        jsonContext: jsonValue 
+      })
+      
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -91,10 +93,12 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
       })
 
       if (!response.ok) {
+        console.error("API response not OK:", response.status, response.statusText)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log("API response data:", data)
       
       // Add assistant message to the chat
       setMessages((prev) => [...prev, { role: "assistant", content: data.message }])
@@ -165,7 +169,7 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
           title: "JSON Applied",
           description: "The JSON has been applied to the editor",
         })
-      } catch (error) {
+      } catch {
         toast({
           title: "Invalid JSON",
           description: "The extracted JSON is not valid",
@@ -175,7 +179,8 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
     }
   }
 
-  // Helper function to format message content with syntax highlighting
+  // Helper function for formatting message content with syntax highlighting (not used currently)
+  /* 
   const formatMessageContent = (content: string) => {
     // Replace code blocks with highlighted syntax
     return content.replace(
@@ -183,6 +188,7 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
       '<pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto my-2"><code class="text-sm font-mono">$2</code></pre>'
     )
   }
+  */
 
   // Function to handle quick prompts
   const handleQuickPrompt = (prompt: string) => {
@@ -319,12 +325,12 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Textarea
-                  placeholder="Ask about JSON or request generation..."
+                  placeholder={isValid ? "Ask about JSON or request generation..." : "Please fix JSON errors in the editor first..."}
                   className="min-h-[80px] resize-none pr-10"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  disabled={isLoading}
+                  disabled={isLoading || !isValid}
                 />
                 <div className="absolute bottom-2 right-2 text-gray-400">
                   <CornerDownLeft className="h-4 w-4" />
@@ -332,7 +338,7 @@ export default function AiAssistant({ jsonValue, setJsonValue, isValid }: AiAssi
               </div>
               <Button
                 className="h-10 w-10 rounded-full p-0"
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading || !input.trim() || !isValid}
                 onClick={handleSendMessage}
               >
                 {isLoading ? (
