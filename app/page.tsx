@@ -1,19 +1,19 @@
 import type { Metadata } from "next"
 import Hero from "@/components/hero"
 import StatsSection from "@/components/stats-section"
-import Companies from "@/components/companies"
+import Features from "@/components/features"
 
 export const metadata: Metadata = {
-  title: "JSON Generator & Editor",
-  description: "Generate, customize, validate, and download JSON files easily",
+  title: "JSON Generator & Editor - Build JSON Structures in Seconds",
+  description: "The most powerful JSON editor with AI assistance, visual builder, and real-time validation. Perfect for developers who value speed and precision.",
 }
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
+    <div className="min-h-screen">
       <Hero />
-      <Companies />
       <StatsSection />
+      <Features />
     </div>
   )
 }

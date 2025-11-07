@@ -3,141 +3,143 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ArrowRight, Sparkles, Zap, Code2 } from "lucide-react"
+import { ArrowRight, Sparkles } from "lucide-react"
 
 export default function Hero() {
   return (
-    <section className="relative w-full overflow-hidden py-12 md:py-24 lg:py-32">
-      {/* Background decoration */}
-      <div className="absolute inset-0 -z-10 opacity-50">
-        <div className="absolute -left-[10%] -top-[10%] h-[500px] w-[500px] rounded-full bg-gradient-to-br from-purple-500/20 to-cyan-500/20 blur-3xl" />
-        <div className="absolute -bottom-[10%] right-[5%] h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-pink-500/20 to-yellow-500/20 blur-3xl" />
-        <div className="absolute left-[40%] top-[60%] h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-green-500/20 to-blue-500/20 blur-3xl" />
-      </div>
+    <section className="relative w-full overflow-hidden px-4 pt-40 pb-24 md:pt-48 md:pb-32 lg:pt-56 lg:pb-40">
 
-      <div className="container px-4 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+      <div className="container relative mx-auto max-w-7xl">
+        <div className="mx-auto max-w-4xl text-center">
+          {/* Badge */}
           <motion.div
-            className="flex flex-col justify-center space-y-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300"
           >
-            <motion.div 
-              className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>Powerful JSON tooling for developers</span>
-            </motion.div>
-            <div className="space-y-2">
-              <h1 className="relative text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">JSON Generator</span> & Editor
-                <motion.div 
-                  className="absolute -right-12 -top-6 text-blue-500"
-                  initial={{ rotate: -20, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  transition={{ delay: 0.7, duration: 0.5 }}
-                >
-                  <Zap className="h-10 w-10" />
-                </motion.div>
-              </h1>
-              <p className="max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                Generate, customize, validate, and download JSON files easily with our powerful editor and AI assistant.
-              </p>
-            </div>
-            <motion.div 
-              className="flex flex-col gap-2 min-[400px]:flex-row"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600">
-                <Link href="/editor">
-                  Try Now <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="outline" size="lg" asChild>
-                <Link href="/features">Learn More</Link>
-              </Button>
-            </motion.div>
-            <motion.div 
-              className="mt-4 flex flex-wrap gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                <Code2 className="h-4 w-4 text-blue-500" />
-                <span>Real-time validation</span>
-              </div>
-              <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                <Sparkles className="h-4 w-4 text-blue-500" />
-                <span>AI-powered assistance</span>
-              </div>
-              <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                <Zap className="h-4 w-4 text-blue-500" />
-                <span>Visual builder</span>
-              </div>
-            </motion.div>
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Powered by Gemini 2.5 Flash AI</span>
           </motion.div>
-          <motion.div
-            className="mx-auto flex items-center justify-center"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+
+          {/* Main heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-6 text-5xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-6xl lg:text-7xl"
           >
-            <div className="relative h-[400px] w-full overflow-hidden rounded-xl border bg-background p-4 shadow-xl">
-              <div className="flex h-full flex-col">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                    <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-                    <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                  </div>
-                  <div className="text-xs font-medium">JSON Generator</div>
-                </div>
-                <div className="flex-1 overflow-hidden font-mono text-sm">
-                  <motion.pre 
-                    className="h-full overflow-auto p-4 text-left"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 0.5 }}
-                  >
-                    <code className="language-json">
-                      {`{
-  "user": {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com",
-    "preferences": {
-      "theme": "dark",
-      "notifications": true
-    },
-    "roles": ["admin", "editor"],
-    "metadata": {
-      "lastLogin": "2023-06-15T10:30:00Z",
-      "accountCreated": "2022-01-10T08:15:30Z"
-    }
-  }
-}`}
-                    </code>
-                  </motion.pre>
-                </div>
-              </div>
-              <motion.div 
-                className="absolute -right-6 -bottom-6 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 p-3 shadow-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-              >
-                <Code2 className="h-6 w-6 text-white" />
-              </motion.div>
-            </div>
+            Build JSON structures
+            <br />
+            <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-clip-text text-transparent">
+              in seconds
+            </span>
+          </motion.h1>
+
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400 md:text-xl"
+          >
+            The most powerful JSON editor with AI assistance, visual builder, and real-time validation. Perfect for developers who value speed and precision.
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mb-12"
+          >
+            <Button
+              asChild
+              size="lg"
+              className="h-12 rounded-full bg-blue-600 px-8 text-base font-medium shadow-lg shadow-blue-600/30 transition-all hover:scale-105 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/40"
+            >
+              <Link href="/editor">
+                Start Building Free
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </motion.div>
         </div>
+
+        {/* Product preview */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="mx-auto mt-20 max-w-6xl"
+        >
+          <div className="relative">
+            {/* Glow effect */}
+            <div className="absolute -inset-4 rounded-3xl bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 opacity-20 blur-3xl"></div>
+            
+            {/* Main preview */}
+            <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-950">
+              {/* Browser chrome */}
+              <div className="flex items-center gap-2 border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
+                <div className="flex gap-2">
+                  <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                  <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+                  <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                </div>
+                <div className="ml-4 flex-1 rounded-md bg-white px-3 py-1 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                  json-generator.app/editor
+                </div>
+              </div>
+
+              {/* Editor content */}
+              <div className="p-6">
+                <div className="grid gap-6 lg:grid-cols-2">
+                  {/* Code editor preview */}
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Code Editor</span>
+                      <div className="flex gap-1">
+                        <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                        <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                      </div>
+                    </div>
+                    <pre className="overflow-x-auto text-xs font-mono leading-relaxed">
+                      <code className="text-gray-700 dark:text-gray-300">
+{`{
+  "user": {
+    "id": 12345,
+    "name": "Alex Johnson",
+    "email": "alex@company.com",
+    "role": "developer",
+    "active": true
+  }
+}`}
+                      </code>
+                    </pre>
+                  </div>
+
+                  {/* AI Assistant preview */}
+                  <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 dark:border-gray-800 dark:from-blue-950 dark:to-cyan-950">
+                    <div className="mb-3 flex items-center gap-2">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
+                        <Sparkles className="h-3.5 w-3.5 text-white" />
+                      </div>
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300">AI Assistant</span>
+                    </div>
+                    <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                      <p className="rounded-md bg-white/60 p-2 dark:bg-gray-900/60">
+                        I&apos;ve generated a user object with common fields.
+                      </p>
+                      <p className="rounded-md bg-white/60 p-2 dark:bg-gray-900/60">
+                        Would you like me to add more properties?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

@@ -1,11 +1,16 @@
 import type React from "react"
-import { Inter } from "next/font/google"
+import { DM_Sans } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import AnimatedBackground from "@/components/animated-background"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+const dmSans = DM_Sans({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dm-sans"
+})
 
 export default function RootLayout({
   children,
@@ -14,9 +19,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={dmSans.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="flex min-h-screen flex-col">
+          <AnimatedBackground />
+          <div className="relative flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />

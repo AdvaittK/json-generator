@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Get the Gemini model
     console.log("Attempting to get Gemini model...");
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     console.log("Successfully got Gemini model.");
 
     // Create chat history from messages

@@ -49,56 +49,88 @@ export default function CodeEditor({ value, onChange, isValid }: CodeEditorProps
   }, [isValid])
 
   return (
-    <div className="relative">
-      <div className="absolute right-4 top-4 z-10 flex gap-2">
+    <div className="relative bg-gradient-to-br from-gray-50/30 to-white/30 dark:from-gray-950/30 dark:to-gray-900/30">
+      {/* Premium Status Badge */}
+      <div className="absolute right-6 top-6 z-10 flex gap-2">
         {isValid ? (
-          <Badge
-            variant="outline"
-            className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
-            Valid JSON
-          </Badge>
+            <Badge
+              variant="outline"
+              className="rounded-lg border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm dark:border-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-400"
+            >
+              <div className="mr-1.5 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              Valid JSON
+            </Badge>
+          </motion.div>
         ) : (
-          <Badge
-            variant="outline"
-            className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
-            Invalid JSON
-          </Badge>
+            <Badge
+              variant="outline"
+              className="rounded-lg border-red-200 bg-gradient-to-br from-red-50 to-pink-50 px-3 py-1.5 text-sm font-semibold text-red-700 shadow-sm dark:border-red-800 dark:from-red-900/30 dark:to-pink-900/30 dark:text-red-400"
+            >
+              <div className="mr-1.5 h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              Invalid JSON
+            </Badge>
+          </motion.div>
         )}
       </div>
 
-      <MonacoEditor
-        height="500px"
-        language="json"
-        theme="vs-dark"
-        value={value}
-        onChange={(value) => onChange(value || "")}
-        onMount={handleEditorDidMount}
-        options={{
-          minimap: { enabled: false },
-          fontSize: 14,
-          wordWrap: "on",
-          formatOnPaste: true,
-          formatOnType: true,
-          automaticLayout: true,
-        }}
-      />
+      {/* Monaco Editor with premium styling */}
+      <div className="overflow-hidden">
+        <MonacoEditor
+          height="600px"
+          language="json"
+          theme="vs-dark"
+          value={value}
+          onChange={(value) => onChange(value || "")}
+          onMount={handleEditorDidMount}
+          options={{
+            minimap: { enabled: true },
+            fontSize: 15,
+            lineHeight: 24,
+            wordWrap: "on",
+            formatOnPaste: true,
+            formatOnType: true,
+            automaticLayout: true,
+            padding: { top: 16, bottom: 16 },
+            smoothScrolling: true,
+            cursorBlinking: "smooth",
+            cursorSmoothCaretAnimation: "on",
+            fontFamily: "'DM Sans', 'Fira Code', 'Menlo', 'Monaco', monospace",
+            fontLigatures: true,
+            renderLineHighlight: "all",
+            scrollBeyondLastLine: false,
+          }}
+        />
+      </div>
 
+      {/* Premium Error Alert */}
       {!isValid && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mt-4"
+          className="border-t border-red-200 bg-gradient-to-br from-red-50/50 to-pink-50/50 p-4 dark:border-red-800 dark:from-red-900/20 dark:to-pink-900/20"
         >
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Invalid JSON</AlertTitle>
-            <AlertDescription>
-              The JSON you entered contains syntax errors. Please check for missing commas, brackets, or quotes.
-            </AlertDescription>
-          </Alert>
+          <div className="flex gap-3">
+            <div className="mt-0.5 rounded-lg bg-gradient-to-br from-red-500 to-pink-500 p-2">
+              <AlertCircle className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h4 className="mb-1 font-semibold text-red-900 dark:text-red-300">Invalid JSON Syntax</h4>
+              <p className="text-sm text-red-700 dark:text-red-400">
+                The JSON you entered contains syntax errors. Please check for missing commas, brackets, or quotes.
+              </p>
+            </div>
+          </div>
         </motion.div>
       )}
     </div>

@@ -7,12 +7,13 @@ import CodeEditor from "@/components/code-editor"
 import VisualEditor from "@/components/visual-editor"
 import AiAssistant from "@/components/ai-assistant"
 import { Button } from "@/components/ui/button"
-import { Download, Copy, Save, FileUp, Code, PanelLeft, MessageSquare, CheckCircle, XCircle, Sparkles, Loader2 } from "lucide-react"
+import { Download, Copy, Save, FileUp, Code, PanelLeft, MessageSquare, CheckCircle, XCircle, Sparkles, Loader2, FileJson } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useLocalStorage } from "@/hooks/use-local-storage"
 import { templates } from "@/lib/templates"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { motion } from "framer-motion"
 
 export default function MainEditor() {
   const { toast } = useToast()
@@ -262,65 +263,104 @@ Example prompt: "restaurants in Pune" should generate JSON with multiple restaur
   }
 
   return (
-    <section className="w-full py-8 md:py-12">
-      <div className="container px-4 md:px-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 flex flex-wrap gap-4 justify-between items-center">
-            <div className="flex-1 min-w-[300px]">
-              <div className="flex flex-wrap gap-2 mb-4">
-                <div className="w-[200px]">
-                  <Select onValueChange={handleLoadTemplate}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Load template" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Select a template</SelectItem>
-                      <SelectItem value="builtin:user">User Profile</SelectItem>
-                      <SelectItem value="builtin:product">Product</SelectItem>
-                      <SelectItem value="builtin:apiResponse">API Response</SelectItem>
-                      {Object.keys(savedTemplates).map((key) => (
-                        <SelectItem key={key} value={key}>
-                          {key}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+    <section className="relative w-full overflow-hidden py-12 md:py-16">
+      <div className="container relative mx-auto px-4 md:px-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-7xl"
+        >
+          {/* Premium Toolbar */}
+          <div className="mb-6 rounded-2xl border border-gray-200/80 bg-white/80 p-4 backdrop-blur-sm dark:border-gray-800/80 dark:bg-gray-900/80 md:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              {/* Left side - Template selector */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gradient-to-br from-gray-50 to-white px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-800 dark:from-gray-900 dark:to-gray-950 dark:text-gray-300">
+                  <FileJson className="h-3.5 w-3.5" />
+                  <span>Template</span>
                 </div>
+                <Select onValueChange={handleLoadTemplate}>
+                  <SelectTrigger className="h-10 w-[200px] rounded-xl border-gray-200 bg-white transition-all hover:border-gray-300 dark:border-gray-800 dark:bg-gray-950">
+                    <SelectValue placeholder="Load template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Select a template</SelectItem>
+                    <SelectItem value="builtin:user">User Profile</SelectItem>
+                    <SelectItem value="builtin:product">Product</SelectItem>
+                    <SelectItem value="builtin:apiResponse">API Response</SelectItem>
+                    {Object.keys(savedTemplates).map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {key}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" onClick={handleImport} className="h-10">
-                    <FileUp className="mr-2 h-4 w-4" />
-                    Import
-                  </Button>
+              {/* Right side - Action buttons */}
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleImport} 
+                  className="h-10 rounded-xl border-gray-200 bg-white transition-all hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900"
+                >
+                  <FileUp className="mr-2 h-4 w-4" />
+                  Import
+                </Button>
 
-                  <Button variant="outline" size="sm" onClick={handleSaveTemplate} className="h-10">
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Template
-                  </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleSaveTemplate} 
+                  className="h-10 rounded-xl border-gray-200 bg-white transition-all hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  Save
+                </Button>
 
-                  <Button variant="outline" size="sm" onClick={handleCopy} className="h-10">
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy
-                  </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleCopy} 
+                  className="h-10 rounded-xl border-gray-200 bg-white transition-all hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-900"
+                >
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy
+                </Button>
 
-                  <Button variant="default" size="sm" onClick={handleDownload} className="h-10 bg-blue-600 hover:bg-blue-700">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
-                  </Button>
-                </div>
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={handleDownload} 
+                  className="h-10 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white transition-all hover:from-blue-700 hover:to-cyan-700 hover:shadow-lg hover:shadow-blue-500/25"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </Button>
               </div>
             </div>
           </div>
 
-          {/* API Key Alert */}
-      
-
-          {/* AI Prompt Input Bar */}
-          <div className="mb-4">
-            <div className="flex gap-2">
+          {/* Premium AI Prompt Bar */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-6 overflow-hidden rounded-2xl border border-purple-200/50 bg-gradient-to-br from-purple-50/50 to-white/50 p-5 backdrop-blur-sm dark:border-purple-800/50 dark:from-purple-950/20 dark:to-gray-900/50"
+          >
+            <div className="mb-3 flex items-center gap-2">
+              <div className="rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-2">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">AI Generation</h3>
+            </div>
+            
+            <div className="flex gap-3">
               <div className="relative flex-1">
                 <Input
-                  placeholder="Enter prompt like 'restaurants in Pune', 'user profiles with addresses', 'product catalog for electronics'"
+                  placeholder="Describe your JSON data: 'restaurants in Pune', 'user profiles', 'product catalog'..."
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
                   onKeyDown={(e) => {
@@ -328,62 +368,84 @@ Example prompt: "restaurants in Pune" should generate JSON with multiple restaur
                       generateJsonFromPrompt();
                     }
                   }}
-                  className="pr-24"
+                  className="h-12 rounded-xl border-purple-200 bg-white/80 pr-24 text-base shadow-sm transition-all placeholder:text-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 dark:border-purple-800 dark:bg-gray-950/50 dark:focus:border-purple-600 dark:focus:ring-purple-900/50"
                 />
               </div>
               <Button 
                 onClick={generateJsonFromPrompt} 
                 disabled={isGenerating || !aiPrompt.trim()}
-                className="bg-purple-600 hover:bg-purple-700"
+                className="h-12 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 text-base font-medium text-white transition-all hover:from-purple-700 hover:to-pink-700 hover:shadow-lg hover:shadow-purple-500/25 disabled:opacity-50"
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Generating...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate JSON
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Generate
                   </>
                 )}
               </Button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Press Enter or click Generate to create JSON based on your prompt
+            <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              Press <kbd className="rounded bg-gray-200 px-1.5 py-0.5 text-xs font-semibold dark:bg-gray-800">Enter</kbd> to generate
             </p>
-          </div>
+          </motion.div>
 
-          <Card className="border-2 shadow-lg overflow-hidden">
-            <Tabs defaultValue="code" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 rounded-none border-b">
-                <TabsTrigger value="code" className="data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-blue-900/20 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 font-medium">
-                  <Code className="mr-2 h-4 w-4" />
-                  Code Editor
-                </TabsTrigger>
-                <TabsTrigger value="visual" className="data-[state=active]:bg-indigo-50 dark:data-[state=active]:bg-indigo-900/20 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 font-medium">
-                  <PanelLeft className="mr-2 h-4 w-4" />
-                  Visual Builder
-                </TabsTrigger>
-                <TabsTrigger value="ai" className="data-[state=active]:bg-green-50 dark:data-[state=active]:bg-green-900/20 data-[state=active]:text-green-600 dark:data-[state=active]:text-green-400 font-medium">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  AI Assistant
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="code" className="p-0 border-0">
-                <div className="relative">
-                  <CodeEditor value={jsonValue} onChange={handleJsonChange} isValid={isValid} />
-                </div>
-              </TabsContent>
-              <TabsContent value="visual" className="border-0">
-                <VisualEditor value={jsonValue} onChange={handleVisualEditorChange} isValid={isValid} />
-              </TabsContent>
-              <TabsContent value="ai" className="border-0">
-                <AiAssistant jsonValue={jsonValue} setJsonValue={setJsonValue} isValid={isValid} />
-              </TabsContent>
-            </Tabs>
-          </Card>
-        </div>
+          {/* Premium Editor Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card className="overflow-hidden rounded-2xl border-2 border-gray-200/80 bg-white shadow-xl dark:border-gray-800/80 dark:bg-gray-900">
+              <Tabs defaultValue="code" className="w-full">
+                <TabsList className="grid h-14 w-full grid-cols-3 rounded-none border-b border-gray-200/80 bg-gray-50/50 p-1 dark:border-gray-800/80 dark:bg-gray-900/50">
+                  <TabsTrigger 
+                    value="code" 
+                    className="group relative rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-950"
+                  >
+                    <Code className="mr-2 h-4 w-4 transition-colors group-data-[state=active]:text-blue-600 dark:group-data-[state=active]:text-blue-400" />
+                    <span className="transition-colors group-data-[state=active]:text-blue-600 dark:group-data-[state=active]:text-blue-400">
+                      Code Editor
+                    </span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="visual" 
+                    className="group relative rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-950"
+                  >
+                    <PanelLeft className="mr-2 h-4 w-4 transition-colors group-data-[state=active]:text-indigo-600 dark:group-data-[state=active]:text-indigo-400" />
+                    <span className="transition-colors group-data-[state=active]:text-indigo-600 dark:group-data-[state=active]:text-indigo-400">
+                      Visual Builder
+                    </span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="ai" 
+                    className="group relative rounded-lg font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-950"
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4 transition-colors group-data-[state=active]:text-green-600 dark:group-data-[state=active]:text-green-400" />
+                    <span className="transition-colors group-data-[state=active]:text-green-600 dark:group-data-[state=active]:text-green-400">
+                      AI Assistant
+                    </span>
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="code" className="border-0 p-0">
+                  <div className="relative">
+                    <CodeEditor value={jsonValue} onChange={handleJsonChange} isValid={isValid} />
+                  </div>
+                </TabsContent>
+                <TabsContent value="visual" className="border-0">
+                  <VisualEditor value={jsonValue} onChange={handleVisualEditorChange} isValid={isValid} />
+                </TabsContent>
+                <TabsContent value="ai" className="border-0">
+                  <AiAssistant jsonValue={jsonValue} setJsonValue={setJsonValue} isValid={isValid} />
+                </TabsContent>
+              </Tabs>
+            </Card>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   )
